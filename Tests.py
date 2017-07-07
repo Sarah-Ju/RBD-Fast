@@ -42,7 +42,7 @@ def rbdfast_test():
     for N in range(50,500):
         X = -pi + 2*pi*np.random.rand(N,ninput)
         Y = f(X).reshape((f(X).shape[0],f(X)[0].size))
-        tSI,tSIc = rbdfast(Y, X = X)
+        tSI,tSIc = rbdfast(Y, x = X)
         SI[:,N-50],SIc[:,N-50] = tSI.reshape((1,3)),tSIc.reshape((1,3))
     #warning('on','RBD:lowSampleSize') #REACTIVER LE WARNING
     
@@ -56,7 +56,7 @@ def rbdfast_test():
     plt.ylabel('SI')
     plt.xlabel('Simulation Number')
     plt.show()
-    
+    """
     #==================== Effect of sample organisation========================
     SIc2 = np.zeros((ninput,450))
     #warning('off','RBD:lowSampleSize') #???????????
@@ -90,7 +90,7 @@ def rbdfast_test():
     plt.ylabel('SI')
     plt.xlabel('Simulation Number')
     plt.show()
-    """
+    
     #======================== Effect of M value ===============================
     SIc = np.zeros((ninput,30))
     SI = np.zeros((ninput,30))
