@@ -7,10 +7,8 @@ With the agreement of Mickael Rabouille, author of the original Matlab code
 @author: translation to python 3.5 Sarah Juricic
 """
 import numpy as np
-from scipy import signal
-import matplotlib.pyplot as plt
 
-class IsNotIntegerError(Exception):
+class IsNotPositiveIntegerError(Exception):
     pass
 
 def to_integer(M):
@@ -30,6 +28,7 @@ def get_sorting_permutation(X):
     X : single column array
     return perm, single column array of permutation
     """
+    N = X.shape[0]
     #get asceding permutation of X
     ascending_perm = sorted(range(len(X)), key = lambda k:X[k])
     #Order the permutation as to form a triangle profile
@@ -39,14 +38,14 @@ def get_sorting_permutation(X):
 #==============================================================================
 #                               RBD FAST
 #==============================================================================
-def rbdfast(Y, X=np.matrix([]), Index=[], M = 10):
+def rbdfast(Y, X=np.matrix([]), Index=np.matrix([]), M = 10):
     """
     RBD python Code for Random Balance Designs
     For the estimation of first order indices
-    
+
        SIc = rbdfast(X,Y) estimation of first order indices according to the X
        values
-    
+
        SIc = rbdfast([],Y,Index) estimation of first order indices according to
        the permutation used to create the sampling design
     
@@ -72,7 +71,7 @@ def rbdfast(Y, X=np.matrix([]), Index=[], M = 10):
     Add: Unbiased estimator from J-Y Tissot & C Prieur.
     Note: The estimate is less dependant on the M value which can be raised up to 10.
     
-    References: 
+    References:
     S. Tarantola, D. Gatelli and T. Mara (2006)
     Random Balance Designs for the Estimation of First Order 
     Global Sensitivity Indices, Reliability Engineering and System Safety, 91:6, 717-727
@@ -83,7 +82,8 @@ def rbdfast(Y, X=np.matrix([]), Index=[], M = 10):
     
     Jean-Yves Tissot, Clémentine Prieur (2012)
     Bias correction for the estimation of sensitivity indices based on random balance designs.
-    Reliability Engineering and System Safety, Elsevier,  107, 205-213. <10.1016/j.ress.2012.06.010> <hal-00507526v2>
+    Reliability Engineering and System Safety, Elsevier,  107, 205-213.
+    <10.1016/j.ress.2012.06.010> <hal-00507526v2>
     """
     # Number of harmonics considered for the Fast Fourier Transform must be int
     M = to_integer(M)
@@ -111,38 +111,35 @@ def rbdfast(Y, X=np.matrix([]), Index=[], M = 10):
               'Insufficient simulations for proper analysis\n')
 
     #Initialization of SI and SIc matrices (sensitivity indices)
-    SI = np.zeros((k,Y[0].size))
-    SIc = np.zeros((k,Y[0].size))
+    SI = np.zeros((k, Y[0].size))
+    SIc = np.zeros((k, Y[0].size))
     lamda = (2*M)/N
-    Yorg = np.zeros((Y.shape[0],Y[0].size))
+    Yorg = np.zeros((Y.shape[0], Y[0].size))
     #for every model input in X (or pre-filled Index)
-    for col in range(0,k):	
+    for col in range(0, k):
         if useindex:
             # ---- reordering of y wrt a-th index
-            for k,ind in enumerate(Index[:,col]):
-                Yorg[k,:] = Y[ind,:].copy()
+            for k, ind in enumerate(Index[:, col]):
+                Yorg[k, :] = Y[ind, :].copy()
         else:
-            # ---- reordering of y wrt a-th variable
-            #Get permutation ordering X wrt a-th variable
-            sortingPerm = sorted(range(len(X[:,col])), key = lambda k:X[:,col][k])
-            #Order the permutation as to form a saw profile
-            finalPerm = sortingPerm[0::2]+sortingPerm[-1-N%2::-2]
+            # ---- reordering of y wrt a-th variable of X
+            permut = get_sorting_permutation(X[:, col])
             #copy ordered Y into new Yorg variable
-            for i,ind in enumerate(finalPerm):
-                Yorg[i,:] = Y[ind,:].copy()
+            for i, ind in enumerate(permut):
+                Yorg[i, :] = Y[ind, :].copy()
 
         #-----calculation spe1 at integer frequency
-        spectrum = np.abs(np.fft.rfft(Yorg[:,0]))**2/N/(N-1)        #(abs(fft(Yorg)))^2/N/(N-1)
+        spectrum = np.abs(np.fft.rfft(Yorg[:, 0]))**2/N/(N-1)        #(abs(fft(Yorg)))^2/N/(N-1)
         # Normalization by N-1 to match the definition of the unbiased variance
         # We thus have the same definition as var(Y)
         # var(Yorg) ~ sum(spectrum(2:end,:))
-        # var(Yorg|Xi) ~ 2*sum(spectrum(2:M+1,:)) = sum(spectrum(2:M+1,:))+sum(spectrum(end:-1:(end+1-M),:))
+        # var(Yorg|Xi) ~ 2*sum(spectrum(2:M+1,:))
+        #= sum(spectrum(2:M+1,:))+sum(spectrum(end:-1:(end+1-M),:))
     
         V = sum(spectrum[1:])                         #sum(spectrum(2:end,:))
-        SI[col,:] = sum(spectrum[1:M+1])/V #facteur 2 inutile???
-        SIc[col,:] = SI[col,:] - lamda/(1-lamda)*(1-SI[col,:])
-    
-    return SI,SIc
+        SI[col, :] = sum(spectrum[1:M+1])/V #facteur 2 inutile???
+        SIc[col, :] = SI[col, :] - lamda/(1-lamda)*(1-SI[col, :])
+    return SI, SIc
 
 
 
