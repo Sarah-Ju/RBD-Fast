@@ -3,10 +3,12 @@
 Created on Wed Jun  7 14:53:15 2017
 
 With the agreement of Mickael Rabouille, author of the original Matlab code
+link to code
 
 @author: translation to python 3.5 Sarah Juricic
 """
 import numpy as np
+warning_on = False
 
 def to_integer(m):
     """
@@ -35,7 +37,7 @@ def get_sorting_permutation(array):
 def bootstrap(k,l,x,y):
     """
     Bootstrap function to evaluate sensitivity of RBD-Fast estimates
-    1000 samples
+    1000 sample
     Takes as arguments :
     x model inputs
     y model outputs
@@ -44,15 +46,18 @@ def bootstrap(k,l,x,y):
     return mean, var
     """
     sample_size = Y.shape[0]
-    all_si_c = np.empty(k,l,1000)
+    all_si_c = np.empty((1000,k,l))
     #calculate sensitivity coef 1000 times
-    for i in range(1000):
+    for i in range(0,1000):
         #random sample on sample_size n with replacement
         indices = np.random.randint(0,high=sample_size,size = sample_size)
-        x_new = np.empty(sample_size,k)
+        x_new = np.empty((sample_size,k))
+        y_new = np.empty((sample_size,l))
         for j,index in enumerate(indices):
-            x_new[j] = x[index]
-        
+            x_new[j,:] = x[index,:]
+            y_new[j,:] = y[index,:]
+        all_si_c[i] = rbdfast(y_new,x_new)[1]
+    return np.mean(all_si_c, axis=0), np.var(all_si_c, axis=0)
         
         
     
@@ -64,6 +69,7 @@ def bootstrap(k,l,x,y):
 def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m = 10, bootstrap = False):
     """
     TO DO : bootstrap
+    Warning on warning off message (or only once)
     
     
     
@@ -82,6 +88,7 @@ def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m = 10, bootstrap = False):
     
        x = n-by-k numpy matrix of model inputs
        y = n-by-l numpy matrix of model output
+       CAUTION : if number of lines != n, this WILL end up in error
        Index = n-by-k numpymatrix of permutations for y to follow
        si_c = k-by-l matrix of estimated first order sensitivity indices unbiased
        si = k-by-l matrix of estimated first order sensitivity indices biased
@@ -139,11 +146,9 @@ def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m = 10, bootstrap = False):
     if y.shape[0] != n:
         print('Error : Arguments dimensions are not consistent')
         return
-
+    
     if n < 2*(m+100):
-        print('\n~~~!!!~~~\n',
-              'RBD:lowSampleSize\n',
-              'Insufficient simulations for proper analysis\n')
+        warning_on = True or warning_on
 
     #Initialization of SI and SIc matrices (sensitivity indices)
     si = np.zeros((k, y[0].size))
@@ -174,6 +179,10 @@ def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m = 10, bootstrap = False):
             print('Bootstrap analysis :\n')
             bootstrap()
             """
+        if warning_on:
+            print('\n~~~!!!~~~\n',
+              'There has been at least on low Sample Size\n',
+              'Insufficient simulations for proper analysis\n')
     return si, si_c
 
 
