@@ -30,7 +30,10 @@ Bias correction for the estimation of sensitivity indices based on random balanc
 Reliability Engineering and System Safety, Elsevier,  107, 205-213.
 <10.1016/j.ress.2012.06.010> <hal-00507526v2>
 
-J. Goffart, M. Rabouille, N. Mendes, Uncertainty and sensitivity analysis applied to hygrothermal simulation of a brick building in a hot and humid climate, J. Build. Perform. Simul. 10 (2017) 37–57. doi:10.1080/19401493.2015.1112430.
+Jeanne Goffart, Mickael Rabouille & Nathan Mendes (2015):
+Uncertainty and sensitivity analysis applied to hygrothermal simulation of a brick
+building in a hot and humid climate, Journal of Building Performance Simulation, DOI:
+10.1080/19401493.2015.1112430
 
 ## Contributors
 
