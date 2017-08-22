@@ -39,8 +39,4 @@ building in a hot and humid climate, Journal of Building Performance Simulation,
 
 Any contribution is welcomed. If you find any bug, don't hesitate to open an issue or submit a PR with fixes.
 
-## License
-
-To be defined soon
-
    
