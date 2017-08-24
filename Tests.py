@@ -7,47 +7,68 @@ With the agreement of Mickael Rabouille, author of the original Matlab code
 @author: translation to python 3.5 Sarah Juricic
 """
 import numpy as np
+#rng shuffle #initialisation du générateur random : utile en python?
+
 
 #==============================================================================
-#           Test function RBD FAST : ISHIGAMI
+#                      Test function : ISHIGAMI
 #==============================================================================
-def rbdfast_test():
+def ishigami_function():
     """
-    ISHIGAMI fonction
+    ISHIGAMI function
     Crestaux et al. (2007) and Marrel et al. (2009) use: a = 7 and b = 0.1.
     Sobol' & Levitan (1999) use: a = 7 and b = 0.05.
     """
     a = 7
     b = 0.05
-    pi = np.math.pi
     f = lambda X:np.sin(X[:,0]) + a*np.sin(X[:,1])**2 + b*X[:,2]**4*np.sin(X[:,0])
-    ninput = 3 # def: X=[x1,x2,x3] -> xi=U(-pi,pi)
+
     from math import pi as pi
     from random import randint as randint
     E = a/2 #??? à quoi sert E ???
-    Vx1 = 1/2*(1 + b*pi**4/5)**2
+    Vx1 = 1/2*(1 + b*(pi**4)/5)**2
     Vx2 = a**2/8
-    Vx13 = b**2*pi**8/225
+    Vx13 = 8*b**2*pi**8/225
     V = Vx1 + Vx2 + Vx13
     exact = np.array([[Vx1/V, 0, 0],
                        [0, Vx2/V, 0],
                        [Vx13/V, 0, 0]])
     exactDiag = exact.diagonal()
-    
-    #rng shuffle #initialisation du générateur random : utile en python?
+    return f, exactDiag
+
+#==============================================================================
+#                       testing algorithm configurations
+#==============================================================================
+
+#==================== Effect of bias ======================================
+def bias_effect():
+    """
+    Compare the biased and unbiased sentivity analysis results
+        defaults with the Ishigami function
+        to do : plot comparison for any case studies
+    returns a plot of the evolution of the results depending on the simulation number
+    """
+    from math import pi as pi
+    from random import randint as randint
     warning_on = False
-    #==================== Effect of bias ======================================
+    ninput = 3 # def: X=[x1,x2,x3] -> xi=U(-pi,pi)
     SIc = np.zeros((ninput,450))
     SI = np.zeros((ninput,450))
-    #warning('off','RBD:lowSampleSize') # DESACTIVER LE WARNING
+    f,exactDiag = ishigami_function()
+    
+    #from 50 to 500 simulations
     for N in range(50,500):
+        #create random model inputs of N simulations
         X = -pi + 2*pi*np.random.rand(N,ninput)
+        #calculate the corresponding Ishigami function output
         Y = f(X).reshape((f(X).shape[0],f(X)[0].size))
-        tSI,tSIc = rbdfast(Y, x = X)
+        #calculate the corresponding sensitivity analysis...
+        tSI,tSIc = rbdfast(Y, x = X, warning_on = warning_on)
+        #... and reshape the results into plottable array
         SI[:,N-50],SIc[:,N-50] = tSI.reshape((1,3)),tSIc.reshape((1,3))
-    #warning('on','RBD:lowSampleSize') #REACTIVER LE WARNING
     
     # Print plot : effect of bias
+    import matplotlib.pyplot as plt
     plt.plot(SI.transpose(),'r--')
     plt.plot(SIc.transpose(),'b--')
     plt.plot([[exactDiag.item(i) for i in range(0,3)] for k in range(0,450)],
