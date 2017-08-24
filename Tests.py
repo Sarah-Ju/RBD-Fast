@@ -16,17 +16,27 @@ from random import randint as randint
 #==============================================================================
 #                      Test function : ISHIGAMI
 #==============================================================================
-def ishigami_function():
+def ishigami_function(n):
     """
     ISHIGAMI function
+    
+    n : integer, sample size
+    
+    return  x,y input and output samples of the Ishigami function (n samples)
+            exactDiag, array, exact values of the sensitivity values
+            
     Crestaux et al. (2007) and Marrel et al. (2009) use: a = 7 and b = 0.1.
     Sobol' & Levitan (1999) use: a = 7 and b = 0.05.
     """
     a = 7
     b = 0.05
-    f = lambda X:np.sin(X[:,0]) + a*np.sin(X[:,1])**2 + b*X[:,2]**4*np.sin(X[:,0])
+    ishigami = lambda X:np.sin(X[:,0]) + a*np.sin(X[:,1])**2 + b*X[:,2]**4*np.sin(X[:,0])
     
-    E = a/2 #??? à quoi sert E ???
+    #generate input and output samples
+    x = -pi + 2*pi*np.random.rand(n,3)
+    y = f(X).reshape((ishigami(x).shape[0],ishigami(x)[0].size))
+    
+    #exact sensitivity values
     Vx1 = 1/2*(1 + b*(pi**4)/5)**2
     Vx2 = a**2/8
     Vx13 = 8*b**2*pi**8/225
@@ -35,7 +45,8 @@ def ishigami_function():
                        [0, Vx2/V, 0],
                        [Vx13/V, 0, 0]])
     exactDiag = exact.diagonal()
-    return f, exactDiag
+    
+    return x, y, exactDiag
 
 #==============================================================================
 #                       testing algorithm configurations
