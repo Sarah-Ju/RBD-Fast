@@ -126,7 +126,6 @@ def rbdfast(y, x=np.array([]), index=np.array([]),
         
     #optionnal bootstrap analysis
     if bootstrap_on:
-        print('Bootstrap analysis :\n')
         return bootstrap(x,y)
 
     # Initialization of SI and SIc matrices (sensitivity indices)
