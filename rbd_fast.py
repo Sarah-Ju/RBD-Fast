@@ -77,12 +77,6 @@ def bootstrap(k, l, x, y):
 def rbdfast(y, x=np.array([]), index=np.array([]),
             m=10, bootstrap=False, warning_on=True):
     """
-    TO DO : bootstrap
-    Warning on warning off message (or only once)
-
-
-
-
     RBD python Code for Random Balance Designs
     For the estimation of first order indices
 
@@ -99,6 +93,7 @@ def rbdfast(y, x=np.array([]), index=np.array([]),
        y = n-by-l numpy matrix of model output
        CAUTION : if number of lines != n, this WILL end up in error
        Index = n-by-k numpymatrix of permutations for y to follow
+       m : integer < n, threshold for the calculation of the indices
        si_c = k-by-l matrix of estimated first order sensitivity indices unbiased
        si = k-by-l matrix of estimated first order sensitivity indices biased
 
