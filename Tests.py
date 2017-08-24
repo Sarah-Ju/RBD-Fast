@@ -6,6 +6,7 @@ With the agreement of Mickael Rabouille, author of the original Matlab code
 
 @author: translation to python 3.5 Sarah Juricic
 """
+import numpy as np
 
 #==============================================================================
 #           Test function RBD FAST : ISHIGAMI
@@ -28,13 +29,13 @@ def rbdfast_test():
     Vx2 = a**2/8
     Vx13 = b**2*pi**8/225
     V = Vx1 + Vx2 + Vx13
-    exact = np.matrix([[Vx1/V, 0, 0],
+    exact = np.array([[Vx1/V, 0, 0],
                        [0, Vx2/V, 0],
                        [Vx13/V, 0, 0]])
     exactDiag = exact.diagonal()
     
     #rng shuffle #initialisation du générateur random : utile en python?
-    
+    warning_on = False
     #==================== Effect of bias ======================================
     SIc = np.zeros((ninput,450))
     SI = np.zeros((ninput,450))
@@ -65,7 +66,7 @@ def rbdfast_test():
         #N+1 values between -pi and +pi
         s0 = np.linspace(-pi,pi,N)
         # 3 random indices for sample size N
-        Index = np.matrix([[randint(0,N-1) for z in range(0,ninput)]for n in range(0,N)])
+        Index = np.array([[randint(0,N-1) for z in range(0,ninput)]for n in range(0,N)])
         # Assigning values to the index -> "random" values between [-pi, pi[
         s = np.zeros((N,ninput))
         for line in range(N):

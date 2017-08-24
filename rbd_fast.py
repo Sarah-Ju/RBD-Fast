@@ -74,7 +74,8 @@ def bootstrap(k, l, x, y):
 #==============================================================================
 #                               RBD FAST
 #==============================================================================
-def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m=10, bootstrap=False):
+def rbdfast(y, x=np.array([]), index=np.array([]),
+            m=10, bootstrap=False, warning_on=True):
     """
     TO DO : bootstrap
     Warning on warning off message (or only once)
@@ -154,16 +155,15 @@ def rbdfast(y, x=np.matrix([]), index=np.matrix([]), m=10, bootstrap=False):
         si[col, :] = sum(spectrum[1:m + 1]) / v
         si_c[col, :] = si[col, :] - lamda / (1 - lamda) * (1 - si[col, :])
 
-        """
+        #optionnal bootstrap analysis
         if bootstrap == True:
             print('Bootstrap analysis :\n')
             bootstrap()
-        """
 
-        if warning_on:
-            print('\n~~~!!!~~~\n',
-                  'There has been at least on low Sample Size\n',
-                  'Insufficient simulations for proper analysis\n')
+#        if warning_on:
+#            print('\n~~~!!!~~~\n',
+#                  'There has been at least on low Sample Size\n',
+#                  'Insufficient simulations for proper analysis\n')
     return si, si_c
 
 
