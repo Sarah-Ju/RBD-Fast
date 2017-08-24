@@ -42,27 +42,26 @@ def get_sorting_permutation(array):
     return perm
 
 
-def bootstrap(k, l, x, y):
+def bootstrap(x, y):
     """
     Bootstrap function to evaluate sensitivity of RBD-Fast estimates
     1000 sample
     Takes as arguments :
     x model inputs
     y model outputs
-    k number of model input
-    l number of model output
     return mean, var
     """
-
-    sample_size = Y.shape[0]
-    all_si_c = np.empty((1000, k, l))
+    ninput = x.shape[1]
+    noutput = y.shape[1]
+    sample_size = y.shape[0]
+    all_si_c = np.empty((1000, ninput, noutput))
 
     # calculate sensitivity coef 1000 times
     for i in range(0, 1000):
         # random sample on sample_size n with replacement
         indices = np.random.randint(0, high=sample_size, size=sample_size)
-        x_new = np.empty((sample_size, k))
-        y_new = np.empty((sample_size, l))
+        x_new = np.empty((sample_size, ninput))
+        y_new = np.empty((sample_size, noutput))
         for j, index in enumerate(indices):
             x_new[j, :] = x[index, :]
             y_new[j, :] = y[index, :]
@@ -75,7 +74,7 @@ def bootstrap(k, l, x, y):
 #                               RBD FAST
 #==============================================================================
 def rbdfast(y, x=np.array([]), index=np.array([]),
-            m=10, bootstrap=False, warning_on=True):
+            m=10, bootstrap_on=False, warning_on=True):
     """
     RBD python Code for Random Balance Designs
     For the estimation of first order indices
@@ -124,6 +123,11 @@ def rbdfast(y, x=np.array([]), index=np.array([]),
 
     if n < 2 * (m + 100):
         warning_on = True or warning_on
+        
+    #optionnal bootstrap analysis
+    if bootstrap_on:
+        print('Bootstrap analysis :\n')
+        return bootstrap(x,y)
 
     # Initialization of SI and SIc matrices (sensitivity indices)
     si = np.zeros((k, y[0].size))
@@ -149,11 +153,6 @@ def rbdfast(y, x=np.array([]), index=np.array([]),
         v = sum(spectrum[1:])
         si[col, :] = sum(spectrum[1:m + 1]) / v
         si_c[col, :] = si[col, :] - lamda / (1 - lamda) * (1 - si[col, :])
-
-        #optionnal bootstrap analysis
-        if bootstrap == True:
-            print('Bootstrap analysis :\n')
-            bootstrap()
 
 #        if warning_on:
 #            print('\n~~~!!!~~~\n',
