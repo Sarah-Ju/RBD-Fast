@@ -7,7 +7,6 @@ With the agreement of Mickael Rabouille, author of the original Matlab code
 @author: translation to python 3.5 Sarah Juricic
 """
 import numpy as np
-#rng shuffle #initialisation du générateur random : utile en python?
 import matplotlib.pyplot as plt
 from math import pi as pi
 from random import randint as randint
@@ -33,7 +32,7 @@ def ishigami_sampler(n):
     
     #generate input and output samples
     x = -pi + 2*pi*np.random.rand(n,3)
-    y = f(x).reshape((ishigami(x).shape[0],ishigami(x)[0].size))
+    y = ishigami(x).reshape((ishigami(x).shape[0],ishigami(x)[0].size))
     return x, y
 
 def exact_ishigami():
